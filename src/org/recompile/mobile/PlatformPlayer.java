@@ -16,10 +16,13 @@
 */
 package org.recompile.mobile;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.Vector;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequencer;
+import javax.sound.midi.Synthesizer;
+import javax.sound.midi.Soundbank;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -205,6 +208,8 @@ public class PlatformPlayer implements Player
 	private class midiPlayer extends audioplayer
 	{
 		private Sequencer midi;
+		private Synthesizer synth;
+		private Soundbank bank;
 
 		private int loops = 0;
 
@@ -212,9 +217,17 @@ public class PlatformPlayer implements Player
 		{
 			try
 			{
-				midi = MidiSystem.getSequencer();
+				midi = MidiSystem.getSequencer(false);
+				synth = MidiSystem.getSynthesizer();
+				bank = MidiSystem.getSoundbank(new File("path/to/file.sf2"));
+				
 				midi.open();
-				midi.setSequence(stream);
+				synth.open();
+				synth.loadAllInstruments(bank);
+				
+				midi.getTransmitter().setReceiver(synth.getReceiver());
+				midi.setSequence(stream);				
+				
 				state = Player.PREFETCHED;
 			}
 			catch (Exception e) { }
