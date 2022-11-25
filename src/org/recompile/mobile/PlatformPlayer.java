@@ -209,7 +209,6 @@ public class PlatformPlayer implements Player
 	{
 		private Sequencer midi;
 		private Synthesizer synth;
-		private Soundbank bank;
 
 		private int loops = 0;
 
@@ -221,11 +220,11 @@ public class PlatformPlayer implements Player
 			{
 				midi = MidiSystem.getSequencer(false);
 				synth = MidiSystem.getSynthesizer();
-				bank = MidiSystem.getSoundbank(new File("path/to/file.sf2"));
 				
 				midi.open();
 				synth.open();
-				synth.loadAllInstruments(bank);
+				synth.unloadAllInstruments(synth.getDefaultSoundbank());
+				synth.loadAllInstruments(MidiSystem.getSoundbank(new File("Nokia_3110_classic.sf2")));
 				
 				midi.getTransmitter().setReceiver(synth.getReceiver());
 				midi.setSequence(stream);				
